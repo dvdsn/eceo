@@ -1,0 +1,48 @@
+---
+title: "Example Dataset: Eye Closure and Auditory Word Memory"
+author: "Doug Davidson"
+date: "July 13, 2018"
+---
+
+
+### Set up
+To set up we will load our libraries and read in the data. For the variable 'eye', EC stands for eyes closed, and EO stands for eyes open. The variable 'sta' stands for word status: whether the word had been seen during encoding ('old') or not ('new'). The outcome variable 'rsp' takes on the values 1=correct, or 0=incorrect.
+
+```{r setup}
+# Setup
+library(BEST)
+library(doBy)
+
+d <- read.table("ECEO_BH.txt", header=TRUE)
+d <- subset(d, rt > 100 & sbj != "s7")
+head(d)
+```
+
+
+### Useful transformations of RT
+Calculate a few tranformations for later use.
+
+```{r transform}
+# Transformations
+d$rt <- d$rt/1000
+d$rtC <- d$rt - mean(d$rt)
+d$logrt <- log1p(d$rt)
+d$logrtC <- d$logRt - mean(d$logrt)
+```
+
+
+### Simple summary
+Here is a simple average of the proportion correct -- first per subject, and then the grand average over the subject averages.
+
+```{r summary}
+# Simple summary
+emn <- summaryBy(rsp~eye+sbj, 
+                 FUN=mean, 
+                 data=d, 
+                 keep.names=TRUE,
+                 order=FALSE)
+
+summaryBy(rsp~eye, 
+          FUN=mean, 
+          data=emn)
+```
